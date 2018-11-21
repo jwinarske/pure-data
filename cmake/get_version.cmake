@@ -1,0 +1,26 @@
+
+set(_CONFIGURE_AC_SCRIPT "configure.ac")
+
+file(STRINGS "${_CONFIGURE_AC_SCRIPT}" PD_VERSION_LINE
+  LIMIT_COUNT 1 REGEX "^AC_INIT")
+
+string(REPLACE "(" "_" PD_VERSION_LINE ${PD_VERSION_LINE})
+string(REPLACE ")" "_" PD_VERSION_LINE ${PD_VERSION_LINE})
+string(REPLACE "[" "_" PD_VERSION_LINE ${PD_VERSION_LINE})
+string(REPLACE "]" "_" PD_VERSION_LINE ${PD_VERSION_LINE})
+
+string(REGEX REPLACE "^AC_INIT__pd_, _([^_]+).*$" "\\1"
+    PD_VERSION_STRING "${PD_VERSION_LINE}")
+
+string(REGEX REPLACE "^([0-9]+)\\.([0-9]+)\\.([0-9]+).*$" "\\1"
+  PD_VER_MAJOR "${PD_VERSION_STRING}")
+string(REGEX REPLACE "^([0-9]+)\\.([0-9]+)\\.([0-9]+).*$" "\\2"
+  PD_VER_MINOR "${PD_VERSION_STRING}")
+string(REGEX REPLACE "^([0-9]+)\\.([0-9]+)\\.([0-9]+).*$" "\\3"
+  PD_VER_PATCH "${PD_VERSION_STRING}")
+
+if(BUILD_NUMBER)
+    set(PD_VERSION ${PD_VER_MAJOR}.${PD_VER_MINOR}.${PD_VER_PATCH}.${BUILD_NUMBER})
+else()
+    set(PD_VERSION ${PD_VER_MAJOR}.${PD_VER_MINOR}.${PD_VER_PATCH}.0)
+endif()
