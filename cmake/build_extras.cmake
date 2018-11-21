@@ -14,7 +14,10 @@ macro(extra_add_lib project proj path)
     if(${proj}_src)
         message(STATUS "Extra: ${project}")
         add_library(${proj}_lib SHARED ${${proj}_src} ${${proj}_headers})
-        add_library(${proj}_lib_static STATIC ${${proj}_src} ${${proj}_headers})
+        add_library(${proj}_staticlib STATIC ${${proj}_src} ${${proj}_headers})
+        install(TARGETS ${proj}_lib ${proj}_staticlib 
+            LIBRARY DESTINATION lib/pd/extra/${project}
+            ARCHIVE DESTINATION lib/pd/extra/${project})
     endif()
 
 endmacro(extra_add_lib)
@@ -30,6 +33,15 @@ foreach(path ${extra_projects})
             SUFFIX ${EXTERNAL_EXTENSION}
             OUTPUT_NAME ${project}
             )
+        set_target_properties(${proj}_staticlib PROPERTIES
+            PREFIX ""
+            SUFFIX ".la"
+            OUTPUT_NAME ${project}
+            )
     endif()
 endforeach(path)
+
+install(DIRECTORY extra DESTINATION lib/pd
+    FILES_MATCHING PATTERN "*.pd")
+
 message(" ")

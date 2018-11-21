@@ -18,6 +18,13 @@ message(STATUS "Pure-Data Version ...... ${PROJECT_VERSION}")
 message(STATUS "Generator .............. ${CMAKE_GENERATOR}")
 message(STATUS "Build Type ............. ${CMAKE_BUILD_TYPE}")
 
+#################################
+# Target Arch                   #
+#################################
+include (get_target_arch)
+get_target_arch(TARGET_ARCH)
+message(STATUS "Target ................. ${TARGET_ARCH}")
+
 include(get_config)
 include(package_config)
 message(" ")
@@ -87,6 +94,21 @@ target_link_libraries(pd PUBLIC
     ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
     )
 
+install(TARGETS pd LIBRARY DESTINATION lib)
+
+install(FILES src/m_pd.h DESTINATION include)
+
+install(DIRECTORY src/ DESTINATION include/pd
+        FILES_MATCHING PATTERN "*.h")
+
+install(DIRECTORY tcl DESTINATION lib/pd
+        FILES_MATCHING PATTERN "*.tcl")
+
+install(DIRECTORY tcl DESTINATION lib/pd
+        FILES_MATCHING PATTERN "*.gif")
+
+install(DIRECTORY DESTINATION lib/pd/startup/disabled)
+
 #################################
 # Build Order Dependencies      #
 #################################
@@ -107,6 +129,7 @@ endif()
 #################################
 add_executable(pdsend src/u_pdsend.c)
 add_executable(pdreceive src/u_pdreceive.c)
+install(TARGETS pdsend pdreceive RUNTIME DESTINATION bin)
 
 #################################
 # Uninstall                     #

@@ -34,3 +34,9 @@ endif()
 
 
 configure_file(pd.pc.in ${CMAKE_BINARY_DIR}/pd.pc @ONLY)
+
+install(FILES ${CMAKE_BINARY_DIR}/pd.pc
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig
+    PERMISSIONS OWNER_WRITE OWNER_READ
+                GROUP_READ
+                WORLD_READ)

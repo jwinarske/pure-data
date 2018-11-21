@@ -1,3 +1,4 @@
+
 include(CheckSymbolExists)
 include(CheckIncludeFile)
 
@@ -25,11 +26,3 @@ check_include_file("bstring.h" HAVE_BSTRING_H)
 if(HAVE_BSTRING_H)
     add_definitions(-DHAVE_BSTRING_H)
 endif()
-
-
-#################################
-# Target Arch                   #
-#################################
-include (get_target_arch)
-get_target_arch(TARGET_ARCH)
-message(STATUS "Target ................. ${TARGET_ARCH}")
