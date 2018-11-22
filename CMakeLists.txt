@@ -68,50 +68,95 @@ link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 #################################
 # Static Library                #
 #################################
-add_library(pd_static STATIC
-    ${PD_D_SRC_FILES} ${PD_G_SRC_FILES} ${PD_M_SRC_FILES}
-    ${PD_S_SRC_FILES} ${PD_X_SRC_FILES}
+add_library(libpd_static STATIC
+    ${PD_D_SRC_FILES} ${PD_G_SRC_FILES}
+    ${PD_M_SRC_FILES} ${PD_X_SRC_FILES}
+    ${PD_S_SRC_FILES}
     )
-set_target_properties(pd_static  PROPERTIES
+set_target_properties(libpd_static  PROPERTIES
     OUTPUT_NAME pd
     )
 
 #################################
-# Shared Library                #
+# Linked Targets                #
 #################################
-add_library(pd SHARED
-    ${PD_D_SRC_FILES} ${PD_G_SRC_FILES} ${PD_M_SRC_FILES} 
-    ${PD_S_SRC_FILES} ${PD_X_SRC_FILES}
-    )
-
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 include(FindThreads)
 
 # needs a better solution
 find_library(LIB_MATH m)
 
-target_link_libraries(pd PUBLIC 
+add_library(libpd SHARED
+    ${PD_D_SRC_FILES} ${PD_G_SRC_FILES}
+    ${PD_M_SRC_FILES} ${PD_X_SRC_FILES}
+    ${PD_S_SRC_FILES}
+    )
+target_link_libraries(libpd PUBLIC 
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
     ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
     )
 
+add_executable(pd src/s_entry.c)
+target_link_libraries(pd PUBLIC libpd_static
+    ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
+    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
+    )
+add_dependencies(pd libpd_static)
+
+add_executable(pd-watchdog src/s_watchdog.c)
+target_link_libraries(pd-watchdog PUBLIC libpd_static
+    ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
+    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
+    )
+add_dependencies(pd-watchdog libpd_static)
+
 #################################
 # Installation                  #
 #################################
-install(TARGETS pd LIBRARY DESTINATION lib)
+install(TARGETS pd libpd libpd_static
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib/static)
+
+install(TARGETS pd 
+        RUNTIME DESTINATION lib/pd/bin)
+
+install(TARGETS pd-watchdog 
+        RUNTIME DESTINATION lib/pd/bin)
 
 install(FILES src/m_pd.h DESTINATION include)
 
 install(DIRECTORY src/ DESTINATION include/pd
         FILES_MATCHING PATTERN "*.h")
 
+install(FILES tcl/pd-gui.tcl DESTINATION lib/pd/tcl
+        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
+        
 install(DIRECTORY tcl DESTINATION lib/pd
-        FILES_MATCHING PATTERN "*.tcl")
+        FILES_MATCHING PATTERN "*.tcl"
+        PATTERN "pd-gui.tcl" EXCLUDE)
+
+configure_file(tcl/pd-gui.in ${CMAKE_BINARY_DIR}/pd-gui @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/pd-gui
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
+                WORLD_READ WORLD_EXECUTE)
 
 install(DIRECTORY tcl DESTINATION lib/pd
         FILES_MATCHING PATTERN "*.gif")
 
-install(DIRECTORY DESTINATION lib/pd/startup/disabled)
+install(DIRECTORY doc DESTINATION lib/pd
+        FILES_MATCHING PATTERN "*"
+        PATTERN "Makefile*" EXCLUDE
+        PATTERN "makefile*" EXCLUDE
+        PATTERN "*.c" EXCLUDE)
+
+# leftoever from pd_extended, not used
+#install(DIRECTORY DESTINATION lib/pd/startup/disabled)
+
 
 #################################
 # Build Order Dependencies      #

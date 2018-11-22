@@ -28,11 +28,13 @@ foreach(path ${extra_projects})
         get_filename_component(project ${path} NAME)
         string(REPLACE "~" "_" proj ${project})
         extra_add_lib(${project} ${proj} ${path})
+
         set_target_properties(${proj}_lib PROPERTIES
             PREFIX ""
             SUFFIX ${EXTERNAL_EXTENSION}
             OUTPUT_NAME ${project}
             )
+            
         set_target_properties(${proj}_staticlib PROPERTIES
             PREFIX ""
             SUFFIX ".la" # todo - unique per target...

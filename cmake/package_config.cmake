@@ -7,10 +7,10 @@ set(PACKAGE_BUGREPORT "")
 set(PACKAGE_URL "")
 set(PACKAGE "${PACKAGE_NAME}")
 set(VERSION "${PROJECT_VERSION}")
-set(prefix ${CMAKE_INSTALL_PREFIX})
 
-set(exec_prefix )
-set(libdir ${CMAKE_INSTALL_PREFIX}/lib)
+set(prefix ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix "\$\{prefix\}")
+set(libdir "\$\{exec_prefix\}/lib")
 set(includedir ${CMAKE_INSTALL_PREFIX}/include)
 
 set(EXTERNAL_CFLAGS ${CMAKE_C_FLAGS})
