@@ -35,7 +35,7 @@ foreach(path ${extra_projects})
             )
         set_target_properties(${proj}_staticlib PROPERTIES
             PREFIX ""
-            SUFFIX ".la"
+            SUFFIX ".la" # todo - unique per target...
             OUTPUT_NAME ${project}
             )
     endif()

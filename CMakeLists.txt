@@ -87,6 +87,7 @@ add_library(pd SHARED
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 include(FindThreads)
 
+# needs a better solution
 find_library(LIB_MATH m)
 
 target_link_libraries(pd PUBLIC 
@@ -94,6 +95,9 @@ target_link_libraries(pd PUBLIC
     ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
     )
 
+#################################
+# Installation                  #
+#################################
 install(TARGETS pd LIBRARY DESTINATION lib)
 
 install(FILES src/m_pd.h DESTINATION include)
