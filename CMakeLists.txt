@@ -45,6 +45,11 @@ endif()
 
 include(system_files)
 
+set(PD_SRC_FILES
+    ${PD_D_SRC_FILES} ${PD_G_SRC_FILES}
+    ${PD_M_SRC_FILES} ${PD_X_SRC_FILES}
+    ${PD_S_SRC_FILES})
+
 #################################
 # Compile/Link Flags            #
 #################################
@@ -59,23 +64,16 @@ endif()
 #################################
 # Dependent Directories         #
 #################################
-include_directories(src
-    ${CMAKE_INSTALL_PREFIX}/include
-    )
+include_directories(src ${CMAKE_INSTALL_PREFIX}/include)
 
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 #################################
 # Static Library                #
 #################################
-add_library(libpd_static STATIC
-    ${PD_D_SRC_FILES} ${PD_G_SRC_FILES}
-    ${PD_M_SRC_FILES} ${PD_X_SRC_FILES}
-    ${PD_S_SRC_FILES}
-    )
-set_target_properties(libpd_static  PROPERTIES
-    OUTPUT_NAME pd
-    )
+add_library(libpd_static STATIC ${PD_SRC_FILES})
+
+set_target_properties(libpd_static PROPERTIES OUTPUT_NAME pd)
 
 #################################
 # Linked Targets                #
@@ -86,28 +84,25 @@ include(FindThreads)
 # needs a better solution
 find_library(LIB_MATH m)
 
-add_library(libpd SHARED
-    ${PD_D_SRC_FILES} ${PD_G_SRC_FILES}
-    ${PD_M_SRC_FILES} ${PD_X_SRC_FILES}
-    ${PD_S_SRC_FILES}
-    )
+add_library(libpd SHARED ${PD_SRC_FILES})
 target_link_libraries(libpd PUBLIC 
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
-    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
-    )
+    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB})
+
+set_target_properties(libpd PROPERTIES OUTPUT_NAME pd)
 
 add_executable(pd src/s_entry.c)
 target_link_libraries(pd PUBLIC libpd_static
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
-    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
-    )
+    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB})
+
 add_dependencies(pd libpd_static)
 
 add_executable(pd-watchdog src/s_watchdog.c)
 target_link_libraries(pd-watchdog PUBLIC libpd_static
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
-    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
-    )
+    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB})
+
 add_dependencies(pd-watchdog libpd_static)
 
 #################################
@@ -169,7 +164,7 @@ endif()
 #################################
 # Extras                        #
 #################################
-if(PA_BUILD_EXTRAS)
+if(PD_BUILD_EXTRAS)
     include(build_extras)
 endif()
 

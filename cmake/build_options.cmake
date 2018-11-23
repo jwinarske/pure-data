@@ -2,13 +2,13 @@
 option(PD_BUILD_ASIO    "ASIO - build ASIO"               OFF)
 option(PD_BUILD_PA      "PortAudio - build PortAudio"     OFF)
 option(PD_BUILD_FFTW3   "FFTW3 - build FFTW3"             OFF)
-option(PA_BUILD_EXTRAS  "Build Extras"                    ON)
+option(PD_BUILD_EXTRAS  "Build Extras"                    ON)
 
 message(" ")
 message(STATUS "PD_BUILD_ASIO .......... ${PD_BUILD_ASIO}")
 message(STATUS "PD_BUILD_PA ............ ${PD_BUILD_PA}")
 message(STATUS "PD_BUILD_FFTW3 ......... ${PD_BUILD_FFTW3}")
-message(STATUS "PD_BUILD_EXTRAS ........ ${PA_BUILD_EXTRAS}")
+message(STATUS "PD_BUILD_EXTRAS ........ ${PD_BUILD_EXTRAS}")
 
 option(USEAPI_ALSA      "Use ALSA library for Audio"      OFF)
 option(USEAPI_AUDIOUNIT "Use AudioUnit library for Audio" OFF)
