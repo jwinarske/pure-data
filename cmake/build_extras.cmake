@@ -31,13 +31,13 @@ foreach(path ${extra_projects})
 
         set_target_properties(${proj}_lib PROPERTIES
             PREFIX ""
-            SUFFIX ${EXTERNAL_EXTENSION}
+            #SUFFIX ${EXTERNAL_EXTENSION}
             OUTPUT_NAME ${project}
             )
             
         set_target_properties(${proj}_staticlib PROPERTIES
             PREFIX ""
-            SUFFIX ".la" # todo - unique per target...
+            #SUFFIX ".la" # todo - unique per target...
             OUTPUT_NAME ${project}
             )
     endif()

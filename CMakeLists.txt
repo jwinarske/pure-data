@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.12.4)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "MinSizeRel" CACHE STRING "Choose the type of build, options are: Debug, Release, or MinSizeRel." FORCE)
@@ -57,6 +57,16 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_definitions(-DPD -DPD_INTERNAL)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_C_STANDARD 99)
+
+add_compile_options(
+    -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
+    "$<$<OR:$<CONFIG:RELEASE>,$<CONFIG:MINSIZEREL>>:-ffast-math>"
+    "$<$<OR:$<CONFIG:RELEASE>,$<CONFIG:MINSIZEREL>>:-funroll-loops>"
+    "$<$<OR:$<CONFIG:RELEASE>,$<CONFIG:MINSIZEREL>>:-fomit-frame-pointer>"
+)
+
 if(APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif()
@@ -78,12 +88,6 @@ set_target_properties(libpd_static PROPERTIES OUTPUT_NAME pd)
 #################################
 # Linked Targets                #
 #################################
-set(CMAKE_THREAD_PREFER_PTHREAD ON)
-include(FindThreads)
-
-# needs a better solution
-find_library(LIB_MATH m)
-
 add_library(libpd SHARED ${PD_SRC_FILES})
 target_link_libraries(libpd PUBLIC 
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
@@ -128,7 +132,7 @@ install(FILES tcl/pd-gui.tcl DESTINATION lib/pd/tcl
         PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE)
-        
+
 install(DIRECTORY tcl DESTINATION lib/pd
         FILES_MATCHING PATTERN "*.tcl"
         PATTERN "pd-gui.tcl" EXCLUDE)
