@@ -104,8 +104,7 @@ if(HAVE_BSTRING_H)
     add_definitions(-DHAVE_BSTRING_H)
 endif()
 
-
-if(${CMAKE_DL_LIBS})
+if(${CMAKE_DL_LIBS} MATCHES "dl")
     add_definitions(-DHAVE_LIBDL)
 endif()
 

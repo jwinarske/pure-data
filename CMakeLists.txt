@@ -57,10 +57,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_definitions(-DPD -DPD_INTERNAL)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_C_STANDARD 99)
 
 add_compile_options(
+    -Dalloca=__builtin_alloca
     -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
     "$<$<OR:$<CONFIG:RELEASE>,$<CONFIG:MINSIZEREL>>:-ffast-math>"
     "$<$<OR:$<CONFIG:RELEASE>,$<CONFIG:MINSIZEREL>>:-funroll-loops>"
