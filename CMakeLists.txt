@@ -91,21 +91,24 @@ set_target_properties(libpd_static PROPERTIES OUTPUT_NAME pd)
 add_library(libpd SHARED ${PD_SRC_FILES})
 target_link_libraries(libpd PUBLIC 
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
-    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB})
+    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
+    ${PORTMIDI_LIBRARY})
 
 set_target_properties(libpd PROPERTIES OUTPUT_NAME pd)
 
 add_executable(pd src/s_entry.c)
 target_link_libraries(pd PUBLIC libpd_static
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
-    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB})
+    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB} ${PORTMIDI_LIBRARY}
+    ${PORTMIDI_LIBRARY})
 
 add_dependencies(pd libpd_static)
 
 add_executable(pd-watchdog src/s_watchdog.c)
 target_link_libraries(pd-watchdog PUBLIC libpd_static
     ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
-    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB})
+    ${LIB_MATH} ${FFTW_LIBRARY} ${AUDIO_LIB}
+    ${PORTMIDI_LIBRARY})
 
 add_dependencies(pd-watchdog libpd_static)
 
@@ -161,8 +164,13 @@ install(DIRECTORY doc DESTINATION lib/pd
 # Build Order Dependencies      #
 #################################
 if(PD_BUILD_FFTW3)
-    add_dependencies(pd fftw3_ext)
-    add_dependencies(pd_static fftw3_ext)
+    add_dependencies(libpd fftw3_ext)
+    add_dependencies(libpd_static fftw3_ext)
+endif()
+
+if(PD_BUILD_PORTMIDI)
+    add_dependencies(libpd portmidi_ext)
+    add_dependencies(libpd_static portmidi_ext)
 endif()
 
 #################################

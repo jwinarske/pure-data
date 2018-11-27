@@ -1,7 +1,7 @@
 
 include(ExternalProject)
 
-IF(WIN32 AND PD_BUILD_ASIO)
+IF(WIN32 OR MSVC AND PD_BUILD_ASIO)
 
     SET(ASIOSDK_VERSION 2.3.2)
 
@@ -31,7 +31,7 @@ IF(WIN32 AND PD_BUILD_ASIO)
 
 ENDIF()
 
-IF(PD_BUILD_PA)
+IF(PD_BUILD_PORTAUDIO)
     IF(NOT ANDROID)
         ExternalProject_Add(portaudio_ext
             GIT_REPOSITORY https://git.assembla.com/portaudio.git
@@ -79,12 +79,16 @@ IF(PD_BUILD_PA)
 
     IF(MSVC)
         IF(${TARGET_ARCH} STREQUAL "x86_64")
-            SET(_PORTAUDIO_LIB portaudio_x64)
+            SET(LIB_PORTAUDIO portaudio_x64)
         ELSE()
-            SET(_PORTAUDIO_LIB portaudio_${TARGET_ARCH})
+            SET(LIB_PORTAUDIO portaudio_${TARGET_ARCH})
         ENDIF()
     ELSE()
-        SET(_PORTAUDIO_LIB portaudio)
+        SET(LIB_PORTAUDIO portaudio)
+    ENDIF()
+
+    IF(WIN32 OR MSVC AND PD_BUILD_ASIO)
+        add_dependencies(portaudio_ext asio_ext)
     ENDIF()
 
 ENDIF()
@@ -135,6 +139,40 @@ IF(PD_BUILD_FFTW3)
         ENDIF()
     ELSE()
         SET(FFTW_LIBRARY fftw3)
+    ENDIF()
+
+ENDIF()
+
+IF(PD_BUILD_PORTMIDI)
+    ExternalProject_Add(portmidi_ext
+    GIT_REPOSITORY https://github.com/jwinarske/portmidi.git
+    GIT_TAG master
+    GIT_SHALLOW 1
+    UPDATE_COMMAND ""
+    BUILD_IN_SOURCE 0
+    CMAKE_ARGS
+    -DANDROID_PLATFORM=${ANDROID_PLATFORM}
+    -DANDROID_ABI=${ANDROID_ABI}
+    -DANDROID_STL=${ANDROID_STL}
+    -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
+    )
+
+    MESSAGE(STATUS "PortMidi Installing to: ${CMAKE_INSTALL_PREFIX}")
+    SET(PORTMIDI_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include)
+    SET(PORTMIDI_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+
+    IF(WIN32)
+        IF("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+            SET(PORTMIDI_LIBRARY portmidid.lib)
+        ELSE()
+            SET(PORTMIDI_LIBRARY portmidi.lib)
+        ENDIF()
+    ELSE()
+        SET(PORTMIDI_LIBRARY portmidi)
     ENDIF()
 
 ENDIF()

@@ -49,13 +49,6 @@ if(SIZEOF_TIMESPEC)
     set(HAVE_TIMESPEC 1)
 endif()
 
-find_library(LIB_MATH NAMES m)
-if(LIB_MATH)
-    cmake_policy(SET CMP0075 NEW)
-    set(CMAKE_REQUIRED_LIBRARIES ${LIB_MATH})
-endif()
-
-
 check_include_file("alloca.h" HAVE_ALLOCA_H)
 if(HAVE_ALLOCA_H)
     add_definitions(-DHAVE_ALLOCA)
@@ -108,5 +101,48 @@ if(${CMAKE_DL_LIBS} MATCHES "dl")
     add_definitions(-DHAVE_LIBDL)
 endif()
 
+
+#################################
+# Library Detection             #
+#################################
+
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 include(FindThreads)
+
+find_library(LIB_MATH NAMES m)
+if(LIB_MATH MATCHES LIB_MATH-NOTFOUND)
+    message(STATUS "LIB_MATH was not found..." )
+    set(LIB_MATH "")
+else()
+    message(STATUS "Using LIB_MATH=${LIB_MATH}" )
+endif()
+
+find_library (LIB_ALSA NAMES asound)
+if(LIB_ALSA MATCHES LIB_ALSA-NOTFOUND)
+    message(STATUS "LIB_ALSA was not found..." )
+    set(LIB_ALSA "")
+else()
+    set(USEAPI_ALSA ON)
+    message(STATUS "Using LIB_ALSA=${LIB_ALSA}" )
+endif()
+
+# this hint needs to be more generic
+find_library (LIB_OSS NAMES oss HINTS /usr/lib/x86_64-linux-gnu/ao/plugins-4)
+if(LIB_OSS MATCHES LIB_OSS-NOTFOUND)
+    message(STATUS "LIB_OSS was not found..." )
+    set(LIB_OSS "")
+else()
+    set(USEAPI_OSS ON)
+    message(STATUS "Using LIB_OSS=${LIB_OSS}" )
+endif()
+
+if(NOT USEAPI_ALSA AND 
+   NOT USEAPI_AUDIOUNIT AND
+   NOT USEAPI_ESD AND 
+   NOT USEAPI_JACK AND
+   NOT USEAPI_MMIO AND 
+   NOT USEAPI_OSS AND 
+   NOT USEAPI_PORTAUDIO
+)
+   set(USEAPI_DUMMY ON)
+endif()
